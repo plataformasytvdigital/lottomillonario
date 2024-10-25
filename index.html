@@ -63,35 +63,23 @@
             text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
         }
         #logo {
-            position: absolute;
-            top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: 1px;
             left: 20px;
-            width: 150px;
+            width: 200px;
         }
         .modal-dialog {
-            max-width: 90vw; /* Cambiado para un ancho mayor */
-            max-height: 90vh; /* Limita la altura del modal */
-            margin: auto; /* Centrado automático */
+            max-width: 80vw;
+            max-height: 80vh;
+            margin: auto;
         }
         .modal-body {
-            overflow-y: auto; /* Agrega desplazamiento vertical */
+            overflow-y: auto;
             display: flex;
             flex-wrap: wrap;
-            justify-content: center; /* Centra los números */
-        }
-        @media (max-width: 768px) {
-            .number {
-                width: 45px;
-                height: 45px;
-                font-size: 1rem;
-            }
-            .btn-custom {
-                padding: 5px 10px;
-                font-size: 1rem;
-            }
-            #logo {
-                width: 120px;
-            }
+            justify-content: center;
         }
     </style>
 </head>
@@ -102,10 +90,12 @@
         <h3>PREMIO<mark><b>$150,000</b></mark></h3>
         <h5>valor de la boleta $2,000</h5>
         <div id="number-list" class="d-flex flex-wrap justify-content-center"></div>
-        <div class="d-flex justify-content-center mt-4 flex-wrap">
-            <button id="btnFilter" class="btn btn-custom">Mostrar Deudas</button>
-            <button id="btnShowAvailable" class="btn btn-custom">Mostrar Números Disponibles</button>
-            <button id="reset-button" class="btn btn-custom">Reiniciar Números</button>
+        <div class="d-flex justify-content-center mt-4">
+            <div class="btn-group" role="group" aria-label="Botones">
+                <button id="btnFilter" class="btn btn-custom">Mostrar Deudas</button>
+                <button id="btnShowAvailable" class="btn btn-custom">Mostrar Números Disponibles</button>
+                <button id="reset-button" class="btn btn-custom">Reiniciar Números</button>
+            </div>
         </div>
         
         <table class="table table-dark table-bordered mt-4">
@@ -187,26 +177,26 @@
         </div>
     </div>
 
-   <!-- Modal para mostrar números disponibles -->
-   <div class="modal fade" id="availableNumbersModal" tabindex="-1" role="dialog" aria-labelledby="availableNumbersModalLabel" aria-hidden="true">
-       <div class="modal-dialog">
-           <div class="modal-content bg-dark text-light">
-               <div class="modal-header">
-                   <h5 class="modal-title" id="availableNumbersModalLabel">Números Disponibles</h5>
-                   <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                       <span aria-hidden="true">&times;</span>
-                   </button>
-               </div>
-               <div class="modal-body" id="available-numbers">
-                   <img src="iomagenes/logo.png" alt="Logo" class="img-fluid mx-auto d-block" style="max-width: 100px; margin-bottom: 20px;">
-                   <!-- Aquí se llenarán los números disponibles -->
-               </div>
-               <div class="modal-footer">
-                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-               </div>
-           </div>
-       </div>
-   </div>
+    <!-- Modal para mostrar números disponibles -->
+    <div class="modal fade" id="availableNumbersModal" tabindex="-1" role="dialog" aria-labelledby="availableNumbersModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="availableNumbersModalLabel">Números Disponibles</h5>
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="available-numbers">
+                    <img src="iomagenes/logo.png" alt="Logo" class="img-fluid mx-auto d-block" style="max-width: 100px; margin-bottom: 20px;">
+                    <!-- Aquí se llenarán los números disponibles -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -222,188 +212,57 @@
         const generateNumbers = () => {
             for (let i = 0; i < 100; i++) {
                 const numberDiv = document.createElement('div');
-                numberDiv.classList.add('number');
-                numberDiv.innerText = String(i).padStart(2, '0');
-                numberDiv.onclick = () => selectNumber(numberDiv.innerText);
+                numberDiv.className = 'number';
+                numberDiv.textContent = (i < 10 ? '0' : '') + i;
+                numberDiv.onclick = () => selectNumber(numberDiv);
                 numberList.appendChild(numberDiv);
             }
         };
 
         // Seleccionar número
-        const selectNumber = (number) => {
-            document.getElementById('selectedNumber').value = number;
+        const selectNumber = (numberDiv) => {
+            const selectedNumber = numberDiv.textContent;
+            document.getElementById('selectedNumber').value = selectedNumber;
             customerModal.show();
         };
 
-        // Función para guardar los datos del cliente
-        const saveCustomer = (status) => {
-            const name = document.getElementById('customerName').value;
-            const phone = document.getElementById('customerPhone').value;
-            const number = document.getElementById('selectedNumber').value;
-
-            if (name && phone) {
-                const row = document.createElement('tr');
-                row.innerHTML = `\
-                    <td><div class="circle">${number}</div></td>\
-                    <td>${name}</td>\
-                    <td>${phone}</td>\
-                    <td>${status}</td>\
-                    <td class="action-buttons">\
-                        <button class="btn btn-danger btn-custom" onclick="setState(this, 'Debe')">Debe</button>\
-                        <button class="btn btn-success btn-custom" onclick="setState(this, 'Pago')">Pago</button>\
-                        <button class="btn btn-warning btn-custom" onclick="clearRow(this)">Limpiar</button>\
-                        <button class="btn btn-primary btn-custom" onclick="setWinner(this, '${name}', '${number}')">Ganador</button>\
-                    </td>`;
-                
-                const rows = Array.from(customerTableBody.querySelectorAll('tr'));
-                const index = rows.findIndex(row => parseInt(row.cells[0].textContent) > parseInt(number));
-                if (index === -1) {
-                    customerTableBody.appendChild(row);
-                } else {
-                    customerTableBody.insertBefore(row, rows[index]);
-                }
-
-                const selectedNumberDiv = [...numberList.children].find(num => num.innerText === number);
-                selectedNumberDiv.classList.add('hidden');
-                selectedNumberDiv.style.opacity = '0.5';
-
-                document.getElementById('customer-form').reset();
-                customerModal.hide();
-            }
+        // Llenar tabla de clientes
+        const fillCustomerTable = () => {
+            // Aquí iría el código para llenar la tabla con datos
         };
 
-        // Mostrar números disponibles
-        const showAvailableNumbers = () => {
-            const availableNumbersDiv = document.getElementById('available-numbers');
-            availableNumbersDiv.innerHTML = ''; // Limpiar
-
-            const numbers = Array.from(numberList.children);
-            numbers.forEach(num => {
-                if (!num.classList.contains('hidden')) {
-                    const div = document.createElement('div');
-                    div.classList.add('number');
-                    div.innerText = num.innerText;
-                    availableNumbersDiv.appendChild(div);
-                }
-            });
-
-            availableNumbersModal.show();
+        // Llenar tabla de deudas
+        const fillDebtTable = () => {
+            // Aquí iría el código para llenar la tabla con datos de deudas
         };
 
-        // Funciones para manejar los botones en la tabla
-        const setState = (btn, state) => {
-            const row = btn.closest('tr');
-            const circle = row.cells[0].querySelector('.circle');
-
-            if (state === 'Debe') {
-                circle.classList.add('debe');
-            } else if (state === 'Pago') {
-                circle.classList.remove('debe');
-                circle.classList.add('pago');
-            }
-            row.cells[3].innerText = state;
+        // Llenar números disponibles
+        const fillAvailableNumbers = () => {
+            // Aquí iría el código para llenar la sección de números disponibles
         };
 
-        const setWinner = (btn, name, number) => {
-            const row = btn.closest('tr');
-            const circle = row.cells[0].querySelector('.circle');
-            circle.classList.add('ganador');
-            row.cells[3].innerText = 'Ganador';
-
-            document.getElementById('winnerNumber').innerText = `Número: ${number}`;
-            document.getElementById('winnerName').innerText = `¡${name} ha ganado!`;
-            winnerModal.show();
-
-            sendWhatsApp(name, number);
-        };
-
-        const sendWhatsApp = (name, number) => {
-            const message = `🎉 ¡Felicidades ${name}! Has ganado con el número ${number}. 🎉`;
-            const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-            window.open(url, '_blank');
-        };
-
-        const clearRow = (btn) => {
-            const row = btn.closest('tr');
-            const circle = row.cells[0].querySelector('.circle');
-            const number = circle.innerText;
-            row.remove();
-
-            const selectedNumberDiv = [...numberList.children].find(num => num.innerText === number);
-            selectedNumberDiv.classList.remove('hidden');
-            selectedNumberDiv.style.opacity = '1';
-        };
-
-        // Mostrar deudas
-        const showDebts = () => {
-            debtTableBody.innerHTML = '';
-            const rows = Array.from(customerTableBody.querySelectorAll('tr'));
-            rows.forEach(row => {
-                if (row.cells[3].innerText === 'Debe') {
-                    const newRow = row.cloneNode(true);
-                    newRow.cells[4].innerHTML = `\
-                        <button class="btn btn-success btn-custom" onclick="markAsPaid(this)">Marcar como Pago</button>\
-                        <button class="btn btn-warning btn-custom" onclick="clearRow(this)">Limpiar</button>\
-                    `;
-                    debtTableBody.appendChild(newRow);
-                }
-            });
+        document.getElementById('btnFilter').onclick = () => {
+            fillDebtTable();
             debtModal.show();
         };
 
-        const markAsPaid = (btn) => {
-            const row = btn.closest('tr');
-            const number = row.cells[0].querySelector('.circle').innerText;
-            const mainRow = Array.from(customerTableBody.querySelectorAll('tr')).find(r => r.cells[0].querySelector('.circle').innerText === number);
-            if (mainRow) {
-                setState(mainRow.cells[4].querySelector('.btn-success'), 'Pago');
-            }
-            debtModal.hide();
+        document.getElementById('btnShowAvailable').onclick = () => {
+            fillAvailableNumbers();
+            availableNumbersModal.show();
         };
 
-        // Limpiar deudas
-        const clearDebts = () => {
-            const rows = Array.from(debtTableBody.querySelectorAll('tr'));
-            rows.forEach(row => {
-                const number = row.cells[0].querySelector('.circle').innerText;
-                clearRow(row.cells[4].querySelector('.btn-warning'));
-            });
-            debtTableBody.innerHTML = '';
-        };
-
-        // Limpiar deudas y tabla principal
-        const clearAllDebts = () => {
-            const rows = Array.from(debtTableBody.querySelectorAll('tr'));
-            rows.forEach(row => {
-                const number = row.cells[0].querySelector('.circle').innerText;
-                clearRow(row.cells[4].querySelector('.btn-warning'));
-            });
-            customerTableBody.querySelectorAll('tr').forEach(row => {
-                if (row.cells[3].innerText === 'Debe') {
-                    clearRow(row.cells[4].querySelector('.btn-warning'));
-                }
-            });
-            debtTableBody.innerHTML = '';
-        };
-
-        // Botones en el modal
-        document.getElementById('btnGuardar').onclick = () => saveCustomer('Guardado');
-        document.getElementById('btnAsignado').onclick = () => saveCustomer('Asignado');
-        document.getElementById('btnFilter').onclick = showDebts;
-        document.getElementById('btnClearDebt').onclick = clearAllDebts;
-        document.getElementById('btnShowAvailable').onclick = showAvailableNumbers;
-
-        // Botón de reinicio
         document.getElementById('reset-button').onclick = () => {
-            const numbers = document.querySelectorAll('.number');
-            numbers.forEach(num => {
-                num.classList.remove('hidden');
-                num.style.opacity = '1';
-            });
-            customerTableBody.innerHTML = '';
+            // Aquí iría el código para reiniciar números
         };
 
-        // Inicializar los números al cargar
+        document.getElementById('btnGuardar').onclick = () => {
+            // Aquí iría el código para guardar los datos del cliente
+        };
+
+        document.getElementById('btnAsignado').onclick = () => {
+            // Aquí iría el código para marcar un número como asignado
+        };
+
         generateNumbers();
     </script>
 </body>
